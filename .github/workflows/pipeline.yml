@@ -1,0 +1,16 @@
+name: Part 11 own pipeline
+
+on:
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize]
+
+
+jobs:
+  deployment_pipeline:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Install deps
+        run: . install_deps.sh
+      - name: Run lint
+        run: npm run lint

@@ -4,6 +4,9 @@ on:
   pull_request:
     branches: [master]
     types: [opened, synchronize]
+  push:
+    branches:
+      - dev
 
 
 jobs:
@@ -18,3 +21,15 @@ jobs:
         run: ./install_deps.sh
       - name: Run lint
         run: npm run lint
+      - name: Run unit tests
+        run: npm run test
+      - name: Run e2e tests
+        uses: cypress-io/github-action@v5
+        with:
+          command: npm run test:e2e
+          start: npm run start-test
+          wait-on: http://localhost:3001
+      - name: Deploy
+        id: deploy
+        if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip') }}
+        run: curl ${{secrets.RENDER_DEPLOY_HOOK}}

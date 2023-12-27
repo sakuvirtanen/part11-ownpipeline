@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Build script"
+echo "Installing npm dependencies in frontend and root (backend) directories"
 
 cd frontend
 npm install

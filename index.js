@@ -92,7 +92,7 @@ app.post("/api/persons", (req, res, next) => {
   newPerson
     .save()
     .then(savedPerson => {
-      res.json(savedPerson)
+      res.status(201).json(savedPerson)
     })
     .catch(err => next(err))
 })
@@ -132,3 +132,5 @@ app.listen(PORT, () => {
   // eslint-disable-next-line no-console
   console.log(`Server running on port ${PORT}`)
 })
+
+module.exports = app

@@ -25,6 +25,7 @@ jobs:
         run: npm run test
         env:
           NODE_ENV: test
+          TEST_DB_URL: ${{secrets.TEST_DB_URL}}
       - name: Run e2e tests
         uses: cypress-io/github-action@v5
         with:

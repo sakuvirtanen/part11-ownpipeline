@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 
-const dbURL = process.env.DB_URL
+const dbURL = process.env.NODE_ENV === "test" ? process.env.TEST_DB_URL : process.env.DB_URL
 
 mongoose
   .connect(dbURL)

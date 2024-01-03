@@ -1,0 +1,53 @@
+name: Part 11 own pipeline
+
+on:
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize]
+  push:
+    branches:
+      - master
+
+
+jobs:
+  deployment_pipeline:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - name: Install deps
+        run: ./install_deps.sh
+      - name: Run lint
+        run: npm run lint
+      - name: Run unit tests
+        run: npm run test
+        env:
+          NODE_ENV: test
+          TEST_DB_URL: ${{secrets.TEST_DB_URL}}
+      - name: Build UI
+        run: npm run build:ui
+      - name: Run e2e tests
+        uses: cypress-io/github-action@v5
+        env:
+          TEST_DB_URL: ${{secrets.TEST_DB_URL}}
+        with:
+          command: npm run test:e2e
+          start: npm run start-test
+          wait-on: http://localhost:3001
+      - name: Deploy
+        id: deploy
+        if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip') }}
+        run: curl ${{secrets.RENDER_DEPLOY_HOOK}}
+  tag_release:
+    needs: [deployment_pipeline]
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Bump version and push tag
+        if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip') }}
+        uses: anothrNick/github-tag-action@8c8163ef62cf9c4677c8e800f36270af27930f42
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: 'patch'

@@ -1,0 +1,16 @@
+name: Periodic health check
+
+
+on:
+  schedule:
+    - cron: '15 18 3 * *'
+
+
+jobs:
+  health_check:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check site health
+        uses: jtalk/url-health-check-action@v3
+        with:
+          url: https://fso-part11.fly.dev/health|https://fso-part11.fly.dev/

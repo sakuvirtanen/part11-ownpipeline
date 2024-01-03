@@ -153,8 +153,6 @@ const App = () => {
         handleNumber={handleNumber}
       />
       <PhonebookContent persons={persons} searchCondition={searchCondition} handleRemove = {handleRemove} />
-      <br />
-      <i>Phonebook app with deployment pipeline for Full Stack Open part 11</i>
     </div>
   )
 

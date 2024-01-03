@@ -40,6 +40,22 @@ jobs:
         id: deploy
         if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip') }}
         run: curl ${{secrets.RENDER_DEPLOY_HOOK}}
+      - name: notify discord on success
+        uses: rjstone/discord-webhook-notify@v1
+        if: ${{success() && steps.deploy.conclusion == 'success'}}
+        with:
+          severity: info
+          text: Pipeline success. New version deployed
+          details: Commit ${{github.sha}} merged succesfully
+          webhookUrl: ${{secrets.DISCORD_WEBHOOK}}
+      - name: notify discord on failure
+        uses: rjstone/discord-webhook-notify@v1
+        if: ${{failure() && github.event_name == 'push'}}
+        with:
+          severity: error
+          text: Pipeline failure
+          details: Some steps failed for commit ${{github.sha}}
+          webhookUrl: ${{secrets.DISCORD_WEBHOOK}}
   tag_release:
     needs: [deployment_pipeline]
     runs-on: ubuntu-20.04
